@@ -1,0 +1,121 @@
+{
+  "models": [
+    {
+      "model": "Firewall",
+      "label_note": "Ground truth from Action field",
+      "rows": 35420,
+      "normal_rows": 7528,
+      "anomaly_rows": 27892,
+      "predicted_anomalies": 30566,
+      "roc_auc": 0.9685510201181329,
+      "pr_auc": 0.9787023623681481,
+      "classification_report": {
+        "Normal": {
+          "precision": 0.9997939843428101,
+          "recall": 0.6446599362380446,
+          "f1-score": 0.7838798255532224,
+          "support": 7528.0
+        },
+        "Anomaly": {
+          "precision": 0.9124844598573578,
+          "recall": 0.9999641474257852,
+          "f1-score": 0.9542235451093093,
+          "support": 27892.0
+        },
+        "accuracy": 0.9244494635798983,
+        "macro avg": {
+          "precision": 0.956139222100084,
+          "recall": 0.822312041831915,
+          "f1-score": 0.8690516853312659,
+          "support": 35420.0
+        },
+        "weighted avg": {
+          "precision": 0.931040815033148,
+          "recall": 0.9244494635798983,
+          "f1-score": 0.9180194931381568,
+          "support": 35420.0
+        }
+      },
+      "inference_ms_per_sample_batch_1": 5.132183409295976,
+      "inference_samples_per_second_batch_1024": 123857.48413279338
+    },
+    {
+      "model": "SSH",
+      "label_note": "Pseudo labels from SSH behavior rules",
+      "rows": 2569,
+      "normal_rows": 1045,
+      "anomaly_rows": 1524,
+      "predicted_anomalies": 1633,
+      "roc_auc": 0.9931463411571161,
+      "pr_auc": 0.9945530466565684,
+      "classification_report": {
+        "Normal": {
+          "precision": 0.9978632478632479,
+          "recall": 0.8937799043062201,
+          "f1-score": 0.9429581019687027,
+          "support": 1045.0
+        },
+        "Anomaly": {
+          "precision": 0.9320269442743417,
+          "recall": 0.9986876640419947,
+          "f1-score": 0.9642065251821349,
+          "support": 1524.0
+        },
+        "accuracy": 0.9560140132347217,
+        "macro avg": {
+          "precision": 0.9649450960687949,
+          "recall": 0.9462337841741074,
+          "f1-score": 0.9535823135754188,
+          "support": 2569.0
+        },
+        "weighted avg": {
+          "precision": 0.9588073791713472,
+          "recall": 0.9560140132347217,
+          "f1-score": 0.9555632389781502,
+          "support": 2569.0
+        }
+      },
+      "inference_ms_per_sample_batch_1": 9.805308212526143,
+      "inference_samples_per_second_batch_1024": 60411.49384212156
+    },
+    {
+      "model": "Web",
+      "label_note": "Pseudo labels from error_rate > 0.5",
+      "rows": 182278,
+      "normal_rows": 181336,
+      "anomaly_rows": 942,
+      "predicted_anomalies": 9114,
+      "roc_auc": 0.9855242153145556,
+      "pr_auc": 0.143187498158756,
+      "classification_report": {
+        "Normal": {
+          "precision": 0.9999653507657481,
+          "recall": 0.9549013985088455,
+          "f1-score": 0.9769139633286319,
+          "support": 181336.0
+        },
+        "Anomaly": {
+          "precision": 0.10269914417379855,
+          "recall": 0.9936305732484076,
+          "f1-score": 0.18615751789976134,
+          "support": 942.0
+        },
+        "accuracy": 0.955101548184641,
+        "macro avg": {
+          "precision": 0.5513322474697733,
+          "recall": 0.9742659858786266,
+          "f1-score": 0.5815357406141967,
+          "support": 182278.0
+        },
+        "weighted avg": {
+          "precision": 0.9953283415457127,
+          "recall": 0.955101548184641,
+          "f1-score": 0.9728273891310107,
+          "support": 182278.0
+        }
+      },
+      "inference_ms_per_sample_batch_1": 9.523424808867276,
+      "inference_samples_per_second_batch_1024": 64752.785161554726
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "model": "SSH",
+  "label_note": "Pseudo labels from SSH behavior rules",
+  "rows": 2569,
+  "normal_rows": 1045,
+  "anomaly_rows": 1524,
+  "predicted_anomalies": 1633,
+  "roc_auc": 0.9931463411571161,
+  "pr_auc": 0.9945530466565684,
+  "classification_report": {
+    "Normal": {
+      "precision": 0.9978632478632479,
+      "recall": 0.8937799043062201,
+      "f1-score": 0.9429581019687027,
+      "support": 1045.0
+    },
+    "Anomaly": {
+      "precision": 0.9320269442743417,
+      "recall": 0.9986876640419947,
+      "f1-score": 0.9642065251821349,
+      "support": 1524.0
+    },
+    "accuracy": 0.9560140132347217,
+    "macro avg": {
+      "precision": 0.9649450960687949,
+      "recall": 0.9462337841741074,
+      "f1-score": 0.9535823135754188,
+      "support": 2569.0
+    },
+    "weighted avg": {
+      "precision": 0.9588073791713472,
+      "recall": 0.9560140132347217,
+      "f1-score": 0.9555632389781502,
+      "support": 2569.0
+    }
+  },
+  "inference_ms_per_sample_batch_1": 9.805308212526143,
+  "inference_samples_per_second_batch_1024": 60411.49384212156
+}

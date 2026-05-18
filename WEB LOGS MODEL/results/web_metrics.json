@@ -1,0 +1,26 @@
+{
+  "total_windows": 182278,
+  "flagged_windows": 9114,
+  "flagged_rate": 0.050000548612558836,
+  "score_min": -0.22973327673254773,
+  "score_max": 0.24936617272555034,
+  "score_mean": 0.19122656208637992,
+  "score_std": 0.07893301900750954,
+  "contamination": 0.05,
+  "n_estimators": 200,
+  "features": [
+    "request_count",
+    "unique_urls",
+    "avg_bytes",
+    "total_bytes",
+    "error_rate",
+    "status_404",
+    "status_500",
+    "post_rate",
+    "url_diversity",
+    "bytes_per_req",
+    "error_to_ok_ratio",
+    "max_bytes",
+    "large_req_count"
+  ]
+}

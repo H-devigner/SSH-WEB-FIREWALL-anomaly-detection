@@ -1,0 +1,83 @@
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION:-9.4.0}
+    container_name: ssh-web-firewall-elasticsearch
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      xpack.security.enrollment.enabled: "false"
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - type: volume
+        source: elasticsearch-data
+        target: /usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:9200/_cluster/health?wait_for_status=yellow\\&timeout=5s || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${ELASTIC_VERSION:-9.4.0}
+    container_name: ssh-web-firewall-kibana
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      SERVER_PUBLICBASEURL: http://localhost:5601
+    ports:
+      - "5601:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:${ELASTIC_VERSION:-9.4.0}
+    container_name: ssh-web-firewall-logstash
+    environment:
+      LS_JAVA_OPTS: -Xms384m -Xmx384m
+      LOGSTASH_SYSLOG_TIMEZONE: ${LOGSTASH_SYSLOG_TIMEZONE:-Africa/Casablanca}
+    volumes:
+      - type: bind
+        source: ./logstash/config/logstash.yml
+        target: /usr/share/logstash/config/logstash.yml
+        read_only: true
+      - type: bind
+        source: ./logstash/pipeline
+        target: /usr/share/logstash/pipeline
+        read_only: true
+      - type: volume
+        source: logstash-data
+        target: /usr/share/logstash/data
+      - type: bind
+        source: ../Firewall/live_logs
+        target: /data/firewall/live_logs
+        read_only: true
+      - type: bind
+        source: ../Firewall/live_scores
+        target: /data/firewall/live_scores
+        read_only: true
+      - type: bind
+        source: ../WEB LOGS MODEL/live_logs
+        target: /data/web/live_logs
+        read_only: true
+      - type: bind
+        source: ../WEB LOGS MODEL/live_scores
+        target: /data/web/live_scores
+        read_only: true
+      - type: bind
+        source: ../SSH/live_logs
+        target: /data/ssh/live_logs
+        read_only: true
+      - type: bind
+        source: ../SSH/live_scores
+        target: /data/ssh/live_scores
+        read_only: true
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+volumes:
+  elasticsearch-data:
+  logstash-data:

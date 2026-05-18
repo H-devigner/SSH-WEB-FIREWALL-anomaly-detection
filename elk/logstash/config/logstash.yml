@@ -1,0 +1,5 @@
+api.http.host: "0.0.0.0"
+config.reload.automatic: true
+pipeline.ecs_compatibility: disabled
+pipeline.workers: 1
+log.level: info

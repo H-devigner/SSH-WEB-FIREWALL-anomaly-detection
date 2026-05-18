@@ -1,32 +1,38 @@
-import pandas as pd
-from sklearn.preprocessing import StandardScaler
+from pathlib import Path
+
 import joblib
+from sklearn.preprocessing import StandardScaler
 
-# 1. Chargement brut
-df = pd.read_csv('data/firewall.csv')
+from firewall_features import FEATURES, add_firewall_features, load_firewall_data
 
-# 2. Feature Engineering (ratios comportementaux)
-df['Bytes_per_Packet'] = df['Bytes'] / (df['Packets'] + 1)
-df['Packet_Rate'] = df['Packets'] / (df['Elapsed Time (sec)'] + 0.001)
-df['Byte_Rate'] = df['Bytes'] / (df['Elapsed Time (sec)'] + 0.001)
-df['Port_Diversity_Ratio'] = df['Destination Port'] / (df['Source Port'] + 1)
 
-FEATURES = [
-    'Source Port', 'Destination Port', 'Bytes', 'Packets', 'Elapsed Time (sec)',
-    'Bytes_per_Packet', 'Packet_Rate', 'Byte_Rate', 'Port_Diversity_Ratio'
-]
+ROOT = Path(__file__).resolve().parents[1]
+DATA_CSV = ROOT / "data" / "raw" / "firewall.csv"
+MODELS_DIR = ROOT / "models"
 
-# 3. Extraction baseline normale (uniquement pour l'apprentissage non supervisé)
-df_normal = df[df['Action'] == 'allow'][FEATURES].dropna()
 
-# 4. Normalisation
-scaler = StandardScaler()
-X_train_full = scaler.fit_transform(df_normal)
+def main() -> None:
+    MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
-# 5. Sauvegarde du pipeline
-joblib.dump({
-    'scaler': scaler,
-    'features': FEATURES,
-    'X_train_full': X_train_full
-}, 'models/firewall_scaler.pkl')
-print("✅ Pipeline sauvegardé dans models/firewall_scaler.pkl")
+    df = add_firewall_features(load_firewall_data(DATA_CSV))
+    normal = df[df["Action"] == "allow"][FEATURES].dropna()
+
+    scaler = StandardScaler()
+    x_train_full = scaler.fit_transform(normal)
+
+    joblib.dump(
+        {
+            "scaler": scaler,
+            "features": FEATURES,
+            "X_train_full": x_train_full,
+            "normal_rows": len(normal),
+        },
+        MODELS_DIR / "firewall_scaler.pkl",
+    )
+
+    print(f"Normal baseline rows: {len(normal):,}")
+    print("Saved models/firewall_scaler.pkl")
+
+
+if __name__ == "__main__":
+    main()

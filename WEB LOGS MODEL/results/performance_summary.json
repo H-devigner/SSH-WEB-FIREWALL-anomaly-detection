@@ -1,0 +1,39 @@
+{
+  "model": "Web",
+  "label_note": "Pseudo labels from error_rate > 0.5",
+  "rows": 182278,
+  "normal_rows": 181336,
+  "anomaly_rows": 942,
+  "predicted_anomalies": 9114,
+  "roc_auc": 0.9855242153145556,
+  "pr_auc": 0.143187498158756,
+  "classification_report": {
+    "Normal": {
+      "precision": 0.9999653507657481,
+      "recall": 0.9549013985088455,
+      "f1-score": 0.9769139633286319,
+      "support": 181336.0
+    },
+    "Anomaly": {
+      "precision": 0.10269914417379855,
+      "recall": 0.9936305732484076,
+      "f1-score": 0.18615751789976134,
+      "support": 942.0
+    },
+    "accuracy": 0.955101548184641,
+    "macro avg": {
+      "precision": 0.5513322474697733,
+      "recall": 0.9742659858786266,
+      "f1-score": 0.5815357406141967,
+      "support": 182278.0
+    },
+    "weighted avg": {
+      "precision": 0.9953283415457127,
+      "recall": 0.955101548184641,
+      "f1-score": 0.9728273891310107,
+      "support": 182278.0
+    }
+  },
+  "inference_ms_per_sample_batch_1": 9.523424808867276,
+  "inference_samples_per_second_batch_1024": 64752.785161554726
+}

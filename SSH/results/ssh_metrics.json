@@ -1,0 +1,32 @@
+{
+  "normal_test_windows": 1045,
+  "pseudo_anomaly_windows": 1524,
+  "roc_auc": 0.9931463411571161,
+  "classification_report": {
+    "Anomaly": {
+      "precision": 0.9320269442743417,
+      "recall": 0.9986876640419947,
+      "f1-score": 0.9642065251821349,
+      "support": 1524.0
+    },
+    "Normal": {
+      "precision": 0.9978632478632479,
+      "recall": 0.8937799043062201,
+      "f1-score": 0.9429581019687027,
+      "support": 1045.0
+    },
+    "accuracy": 0.9560140132347217,
+    "macro avg": {
+      "precision": 0.9649450960687949,
+      "recall": 0.9462337841741074,
+      "f1-score": 0.9535823135754188,
+      "support": 2569.0
+    },
+    "weighted avg": {
+      "precision": 0.9588073791713472,
+      "recall": 0.9560140132347217,
+      "f1-score": 0.9555632389781502,
+      "support": 2569.0
+    }
+  }
+}

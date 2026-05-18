@@ -1,56 +1,84 @@
-import pandas as pd
-import numpy as np
+from pathlib import Path
+import json
+
 import joblib
+import numpy as np
+import pandas as pd
 from sklearn.metrics import classification_report, roc_auc_score
-import warnings
-warnings.filterwarnings('ignore')
 
-# 1. Chargement
-model = joblib.load('models/firewall_isolation.pkl')
-pipeline = joblib.load('models/firewall_scaler_test.pkl')
-scaler = pipeline['scaler']
-FEATURES = pipeline['features']
-X_test = pipeline['X_test']  # 20% jamais vus
+from firewall_features import add_firewall_features, load_firewall_data
 
-# 2. Charger les anomalies depuis le CSV
-df = pd.read_csv('data/firewall.csv')
-df['Bytes_per_Packet'] = df['Bytes'] / (df['Packets'] + 1)
-df['Packet_Rate'] = df['Packets'] / (df['Elapsed Time (sec)'] + 0.001)
-df['Byte_Rate'] = df['Bytes'] / (df['Elapsed Time (sec)'] + 0.001)
-df['Port_Diversity_Ratio'] = df['Destination Port'] / (df['Source Port'] + 1)
 
-df_anomalies = df[df['Action'] != 'allow'][FEATURES].dropna()
-X_anomalies = scaler.transform(df_anomalies)
+ROOT = Path(__file__).resolve().parents[1]
+DATA_CSV = ROOT / "data" / "raw" / "firewall.csv"
+MODELS_DIR = ROOT / "models"
+RESULTS_DIR = ROOT / "results"
 
-# 3. Test set final = 20% normal + toutes anomalies
-X_test_combined = np.vstack([X_test, X_anomalies])
-y_test_labels = [1] * len(X_test) + [-1] * len(df_anomalies)
-y_binary = (np.array(y_test_labels) == -1).astype(int)
 
-# 4. Prédictions & Scores
-y_pred = model.predict(X_test_combined)
-anomaly_scores = -model.decision_function(X_test_combined)
+def main() -> None:
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
-# 5. Métriques
-print("=== Classification Report (DONNÉES INVISIBLES) ===")
-print(classification_report(
-    y_test_labels, y_pred,
-    target_names=['Anomalie', 'Normal'],
-    labels=[-1, 1],
-    zero_division=0
-))
+    model = joblib.load(MODELS_DIR / "firewall_isolation.pkl")
+    pipeline = joblib.load(MODELS_DIR / "firewall_scaler_test.pkl")
+    scaler = pipeline["scaler"]
+    features = pipeline["features"]
+    x_test_normal = pipeline["X_test_normal"]
 
-roc_auc = roc_auc_score(y_binary, anomaly_scores)
-print(f"\n📊 ROC-AUC: {roc_auc:.4f}")
-if roc_auc >= 0.85:
-    print("✅ Seuil validé pour SENTINEL CORE (≥ 0.85)")
-else:
-    print("⚠️ Ajustement recommandé : revoir features ou contamination")
+    df = add_firewall_features(load_firewall_data(DATA_CSV))
+    anomalies = df[df["Action"] != "allow"][features].dropna()
+    x_anomalies = scaler.transform(anomalies)
 
-# 6. Export pour Kibana
-results = pd.DataFrame(X_test_combined, columns=FEATURES)
-results['true_label'] = y_test_labels
-results['prediction'] = y_pred
-results['anomaly_score'] = anomaly_scores
-results.to_csv('results/firewall_eval_kibana.csv', index=False)
-print("📤 Résultats exportés → results/firewall_eval_kibana.csv")
+    x_eval = np.vstack([x_test_normal, x_anomalies])
+    y_true = np.array([1] * len(x_test_normal) + [-1] * len(x_anomalies))
+    y_binary = (y_true == -1).astype(int)
+
+    y_pred = model.predict(x_eval)
+    anomaly_scores = -model.decision_function(x_eval)
+    roc_auc = roc_auc_score(y_binary, anomaly_scores)
+
+    report = classification_report(
+        y_true,
+        y_pred,
+        target_names=["Anomaly", "Normal"],
+        labels=[-1, 1],
+        zero_division=0,
+        output_dict=True,
+    )
+
+    print("=== Firewall Classification Report ===")
+    print(
+        classification_report(
+            y_true,
+            y_pred,
+            target_names=["Anomaly", "Normal"],
+            labels=[-1, 1],
+            zero_division=0,
+        )
+    )
+    print(f"ROC-AUC: {roc_auc:.4f}")
+
+    results = pd.DataFrame(x_eval, columns=features)
+    results["true_label"] = y_true
+    results["prediction"] = y_pred
+    results["anomaly_score"] = anomaly_scores
+    results["is_anomaly"] = y_pred == -1
+    results.to_csv(RESULTS_DIR / "firewall_evaluation.csv", index=False)
+
+    with (RESULTS_DIR / "firewall_metrics.json").open("w") as handle:
+        json.dump(
+            {
+                "normal_test_rows": int(len(x_test_normal)),
+                "anomaly_rows": int(len(x_anomalies)),
+                "roc_auc": float(roc_auc),
+                "classification_report": report,
+            },
+            handle,
+            indent=2,
+        )
+
+    print("Saved results/firewall_evaluation.csv")
+    print("Saved results/firewall_metrics.json")
+
+
+if __name__ == "__main__":
+    main()

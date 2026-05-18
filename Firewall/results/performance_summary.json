@@ -1,0 +1,39 @@
+{
+  "model": "Firewall",
+  "label_note": "Ground truth from Action field",
+  "rows": 35420,
+  "normal_rows": 7528,
+  "anomaly_rows": 27892,
+  "predicted_anomalies": 30566,
+  "roc_auc": 0.9685510201181329,
+  "pr_auc": 0.9787023623681481,
+  "classification_report": {
+    "Normal": {
+      "precision": 0.9997939843428101,
+      "recall": 0.6446599362380446,
+      "f1-score": 0.7838798255532224,
+      "support": 7528.0
+    },
+    "Anomaly": {
+      "precision": 0.9124844598573578,
+      "recall": 0.9999641474257852,
+      "f1-score": 0.9542235451093093,
+      "support": 27892.0
+    },
+    "accuracy": 0.9244494635798983,
+    "macro avg": {
+      "precision": 0.956139222100084,
+      "recall": 0.822312041831915,
+      "f1-score": 0.8690516853312659,
+      "support": 35420.0
+    },
+    "weighted avg": {
+      "precision": 0.931040815033148,
+      "recall": 0.9244494635798983,
+      "f1-score": 0.9180194931381568,
+      "support": 35420.0
+    }
+  },
+  "inference_ms_per_sample_batch_1": 5.132183409295976,
+  "inference_samples_per_second_batch_1024": 123857.48413279338
+}
