@@ -433,6 +433,21 @@ SSH/live_logs/ssh_auth.log
 
 It generates a mix of normal-looking and suspicious-looking events.
 
+The generator deliberately varies:
+
+```text
+Web: source IP, method, URL path, status code, byte count
+SSH: source IP, user, sensor, auth method, failed login style, scan style
+Firewall: action, ports, packet counts, byte counts, elapsed time
+```
+
+Useful options:
+
+```text
+--attack-rate  Approximate suspicious event ratio per log type
+--seed         Repeatable random seed for demos
+```
+
 ### Listener And Scorer
 
 `live/listen_and_score.py` tails all three files and loads each trained model.

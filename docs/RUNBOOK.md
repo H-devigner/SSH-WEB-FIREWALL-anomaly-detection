@@ -163,13 +163,13 @@ This writes synthetic logs for all three types:
 
 ```bash
 source .venv/bin/activate
-python live/generate_logs.py --reset --count 100 --interval 0.5
+python live/generate_logs.py --reset --count 100 --interval 0.5 --attack-rate 0.3
 ```
 
 Useful shorter smoke test:
 
 ```bash
-python live/generate_logs.py --reset --count 10 --interval 0
+python live/generate_logs.py --reset --count 10 --interval 0 --attack-rate 0.35 --seed 42
 ```
 
 ## 5. Watch Local Files
@@ -242,6 +242,12 @@ Then generate new logs:
 
 ```bash
 python live/generate_logs.py --count 50 --interval 0.2
+```
+
+For a more aggressive dashboard demo:
+
+```bash
+python live/generate_logs.py --count 100 --interval 0.2 --attack-rate 0.45
 ```
 
 ### Logstash Does Not Pick Up New Parser Changes

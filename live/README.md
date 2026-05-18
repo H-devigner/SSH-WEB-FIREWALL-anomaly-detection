@@ -30,11 +30,18 @@ Terminal 1:
 python live/listen_and_score.py --from-start
 
 Terminal 2:
-python live/generate_logs.py --reset --count 30 --interval 0.5
+python live/generate_logs.py --reset --count 30 --interval 0.5 --attack-rate 0.3
 
 One-shot test:
-python live/generate_logs.py --reset --count 10 --interval 0
+python live/generate_logs.py --reset --count 10 --interval 0 --attack-rate 0.35 --seed 42
 python live/listen_and_score.py --from-start --max-events 30
+
+Generator options:
+- `--attack-rate` controls the approximate suspicious ratio for each type.
+- `--seed` makes the generated demo repeatable.
+- Web logs vary client IPs, methods, URLs, byte counts, and HTTP outcomes.
+- SSH logs vary source IPs, users, sensors, auth methods, failed logins,
+  invalid users, authentication failures, scans, and closed connections.
 
 ELK integration:
 See ../elk/README.md for Docker Compose, Logstash file ingestion, Elasticsearch

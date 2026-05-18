@@ -31,6 +31,72 @@ FIREWALL_COLUMNS = [
     "pkts_received",
 ]
 
+WEB_NORMAL_HOSTS = [
+    "198.51.100.10",
+    "198.51.100.22",
+    "198.51.100.31",
+    "198.51.100.44",
+    "192.0.2.15",
+    "192.0.2.28",
+    "192.0.2.61",
+    "203.0.113.12",
+]
+WEB_SUSPICIOUS_HOSTS = [
+    "203.0.113.50",
+    "203.0.113.77",
+    "203.0.113.88",
+    "198.51.100.190",
+    "192.0.2.200",
+]
+WEB_NORMAL_URLS = [
+    "/",
+    "/index.html",
+    "/health",
+    "/assets/app.js",
+    "/assets/theme.css",
+    "/images/logo.png",
+    "/api/products",
+    "/api/orders",
+    "/docs/api",
+    "/login",
+    "/search?q=firewall",
+]
+WEB_SUSPICIOUS_URLS = [
+    "/admin",
+    "/wp-login.php",
+    "/../../etc/passwd",
+    "/.env",
+    "/phpmyadmin/index.php",
+    "/api/upload",
+    "/cgi-bin/test.cgi",
+    "/shell?cmd=id",
+    "/manager/html",
+    "/login?redirect=../../etc/passwd",
+]
+
+SSH_SENSORS = ["ssh-sensor-01", "ssh-sensor-02", "edge-bastion-01", "vpn-gateway-01"]
+SSH_NORMAL_HOSTS = [
+    "198.51.100.24",
+    "198.51.100.25",
+    "198.51.100.36",
+    "192.0.2.41",
+    "192.0.2.42",
+    "203.0.113.21",
+]
+SSH_SUSPICIOUS_HOSTS = [
+    "203.0.113.90",
+    "203.0.113.91",
+    "203.0.113.92",
+    "198.51.100.201",
+    "192.0.2.222",
+]
+SSH_NORMAL_USERS = ["ops", "backup", "deploy", "git", "monitor", "service"]
+SSH_SUSPICIOUS_USERS = ["root", "admin", "oracle", "test", "postgres", "ubuntu", "guest", "support"]
+
+
+def is_suspicious_event(attack_rate: float) -> bool:
+    return random.random() < max(0.0, min(attack_rate, 1.0))
+
 
 def ensure_parent(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -56,8 +122,8 @@ def load_firewall_samples() -> tuple[pd.DataFrame, pd.DataFrame]:
     return normal, anomaly
 
 
-def firewall_event(index: int, normal: pd.DataFrame, anomaly: pd.DataFrame) -> dict:
-    source = anomaly if index % 4 == 3 else normal
+def firewall_event(normal: pd.DataFrame, anomaly: pd.DataFrame, attack_rate: float) -> dict:
+    source = anomaly if is_suspicious_event(attack_rate) else normal
     row = source.sample(1, random_state=random.randint(1, 10_000_000)).iloc[0]
     event = {name: row[name] for name in FIREWALL_COLUMNS}
     for name in FIREWALL_COLUMNS:
@@ -76,21 +142,28 @@ def write_firewall_event(event: dict) -> None:
         writer.writerow(event)
 
 
-def web_event(index: int) -> dict:
-    attack = index % 4 == 3
+def web_event(attack_rate: float) -> dict:
+    attack = is_suspicious_event(attack_rate)
     if attack:
+        mode = random.choice(["scanner", "bruteforce", "upload_probe", "path_traversal"])
+        status_pool = {
+            "scanner": [400, 401, 403, 404, 404, 429],
+            "bruteforce": [401, 401, 403, 429, 500],
+            "upload_probe": [403, 404, 413, 500, 502, 503],
+            "path_traversal": [400, 403, 404, 500],
+        }[mode]
         return {
-            "host": "203.0.113.50",
-            "method": random.choice(["GET", "POST"]),
-            "url": random.choice(["/admin", "/wp-login.php", "/../../etc/passwd", "/api/upload"]),
-            "status": random.choice([404, 404, 500]),
+            "host": random.choice(WEB_SUSPICIOUS_HOSTS),
+            "method": random.choice(["GET", "POST", "PUT", "DELETE"]),
+            "url": random.choice(WEB_SUSPICIOUS_URLS),
+            "status": random.choice(status_pool),
             "bytes": random.randint(60_000, 260_000),
         }
     return {
-        "host": random.choice(["198.51.100.10", "198.51.100.22", "192.0.2.15"]),
-        "method": "GET",
-        "url": random.choice(["/", "/index.html", "/assets/app.js", "/health"]),
-        "status": random.choice([200, 200, 200, 304]),
+        "host": random.choice(WEB_NORMAL_HOSTS),
+        "method": random.choices(["GET", "HEAD", "POST"], weights=[0.78, 0.12, 0.10], k=1)[0],
+        "url": random.choice(WEB_NORMAL_URLS),
+        "status": random.choices([200, 201, 204, 206, 301, 302, 304, 401], weights=[58, 3, 5, 2, 5, 4, 20, 3], k=1)[0],
         "bytes": random.randint(300, 7_500),
     }
 
@@ -109,20 +182,46 @@ def write_web_event(event: dict) -> None:
         handle.write(apache_line(event) + "\n")
 
 
-def ssh_line(index: int) -> str:
-    sensor = "ssh-sensor-01"
-    pid = 30_000 + index
+def ssh_line(index: int, attack_rate: float) -> str:
+    sensor = random.choice(SSH_SENSORS)
+    pid = 30_000 + index + random.randint(0, 2_500)
     stamp = datetime.now().strftime("%b %e %H:%M:%S")
-    if index % 4 == 3:
-        source_ip = "203.0.113.90"
-        user = random.choice(["root", "admin", "oracle", "deploy", "test"])
+    if is_suspicious_event(attack_rate):
+        source_ip = random.choice(SSH_SUSPICIOUS_HOSTS)
+        user = random.choice(SSH_SUSPICIOUS_USERS)
         port = random.randint(30_000, 61_000)
-        return f"{stamp} {sensor} sshd[{pid}]: Failed password for invalid user {user} from {source_ip} port {port} ssh2"
+        event_type = random.choices(
+            [
+                "failed_invalid",
+                "failed_known",
+                "invalid_user",
+                "auth_failure",
+                "connection_scan",
+                "connection_closed",
+            ],
+            weights=[38, 18, 18, 10, 10, 6],
+            k=1,
+        )[0]
+        if event_type == "failed_invalid":
+            return f"{stamp} {sensor} sshd[{pid}]: Failed password for invalid user {user} from {source_ip} port {port} ssh2"
+        if event_type == "failed_known":
+            return f"{stamp} {sensor} sshd[{pid}]: Failed password for {user} from {source_ip} port {port} ssh2"
+        if event_type == "invalid_user":
+            return f"{stamp} {sensor} sshd[{pid}]: Invalid user {user} from {source_ip}"
+        if event_type == "auth_failure":
+            return (
+                f"{stamp} {sensor} sshd[{pid}]: pam_unix(sshd:auth): authentication failure; "
+                f"logname= uid=0 euid=0 tty=ssh ruser= rhost={source_ip} user={user}"
+            )
+        if event_type == "connection_scan":
+            return f"{stamp} {sensor} sshd[{pid}]: Did not receive identification string from {source_ip}"
+        return f"{stamp} {sensor} sshd[{pid}]: Connection closed by {source_ip} port {port} [preauth]"
 
-    source_ip = random.choice(["198.51.100.24", "198.51.100.25"])
-    user = random.choice(["ops", "backup", "deploy"])
+    source_ip = random.choice(SSH_NORMAL_HOSTS)
+    user = random.choice(SSH_NORMAL_USERS)
     port = random.randint(30_000, 61_000)
-    return f"{stamp} {sensor} sshd[{pid}]: Accepted publickey for {user} from {source_ip} port {port} ssh2"
+    auth_method = random.choice(["publickey", "password"])
+    return f"{stamp} {sensor} sshd[{pid}]: Accepted {auth_method} for {user} from {source_ip} port {port} ssh2"
 
 
 def write_ssh_line(line: str) -> None:
@@ -135,17 +234,22 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Generate Firewall, Web, and SSH logs for live scoring.")
     parser.add_argument("--count", type=int, default=30, help="Number of events per type to generate.")
     parser.add_argument("--interval", type=float, default=0.5, help="Seconds between generated event batches.")
+    parser.add_argument("--attack-rate", type=float, default=0.30, help="Approximate suspicious event ratio per log type.")
+    parser.add_argument("--seed", type=int, default=None, help="Optional random seed for reproducible demo logs.")
     parser.add_argument("--reset", action="store_true", help="Remove existing live logs and score files first.")
     args = parser.parse_args()
+
+    if args.seed is not None:
+        random.seed(args.seed)
 
     if args.reset:
         reset_outputs()
 
     normal_firewall, anomaly_firewall = load_firewall_samples()
     for index in range(args.count):
-        write_firewall_event(firewall_event(index, normal_firewall, anomaly_firewall))
-        write_web_event(web_event(index))
-        write_ssh_line(ssh_line(index))
+        write_firewall_event(firewall_event(normal_firewall, anomaly_firewall, args.attack_rate))
+        write_web_event(web_event(args.attack_rate))
+        write_ssh_line(ssh_line(index, args.attack_rate))
         print(f"generated batch {index + 1}/{args.count}", flush=True)
         if args.interval > 0:
             time.sleep(args.interval)

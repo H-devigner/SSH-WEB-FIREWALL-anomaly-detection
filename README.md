@@ -79,7 +79,7 @@ Terminal 2:
 
 ```bash
 source .venv/bin/activate
-python live/generate_logs.py --reset --count 100 --interval 0.5
+python live/generate_logs.py --reset --count 100 --interval 0.5 --attack-rate 0.3
 ```
 
 ## Main Documentation
@@ -142,6 +142,8 @@ SSH/live_scores/ssh_scores.jsonl
 ```
 
 Logstash reads both the raw log files and the score files, indexes them into Elasticsearch, and Kibana visualizes raw activity, prediction volume, anomaly mix, risk, and normalized status fields.
+
+The live generator supports `--attack-rate` and `--seed`, and it varies Web source IPs, URLs, HTTP methods/statuses, SSH source IPs, users, sensors, accepted logins, invalid users, authentication failures, scans, and closed connections.
 
 ## Stop ELK
 

@@ -253,5 +253,5 @@ elk/setup_kibana.sh
 Then generate fresh live data:
 
 ```bash
-python live/generate_logs.py --reset --count 100 --interval 0.5
+python live/generate_logs.py --reset --count 100 --interval 0.5 --attack-rate 0.3
 ```
