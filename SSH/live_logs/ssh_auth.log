@@ -225,3 +225,13 @@ May 19 00:40:42 ssh-sensor-01 sshd[30006]: Accepted publickey for backup from 19
 May 19 00:40:42 ssh-sensor-01 sshd[30007]: Failed password for invalid user oracle from 203.0.113.90 port 35826 ssh2
 May 19 00:40:43 ssh-sensor-01 sshd[30008]: Accepted publickey for ops from 198.51.100.25 port 31572 ssh2
 May 19 00:40:43 ssh-sensor-01 sshd[30009]: Accepted publickey for deploy from 198.51.100.25 port 55273 ssh2
+May 19 00:48:39 vpn-gateway-01 sshd[30695]: Failed password for root from 192.0.2.222 port 49943 ssh2
+May 19 00:48:39 ssh-sensor-01 sshd[31858]: Accepted password for monitor from 198.51.100.36 port 51143 ssh2
+May 19 00:48:40 ssh-sensor-02 sshd[30076]: Accepted publickey for deploy from 192.0.2.41 port 34453 ssh2
+May 19 00:48:40 ssh-sensor-01 sshd[31852]: Connection closed by 203.0.113.92 port 32137 [preauth]
+May 19 00:48:41 ssh-sensor-01 sshd[31019]: Accepted password for monitor from 198.51.100.36 port 44294 ssh2
+May 19 00:48:41 ssh-sensor-01 sshd[31713]: Accepted password for monitor from 198.51.100.25 port 49420 ssh2
+May 19 00:48:42 vpn-gateway-01 sshd[30806]: Accepted publickey for git from 192.0.2.42 port 50177 ssh2
+May 19 00:48:42 ssh-sensor-02 sshd[30832]: Accepted password for ops from 192.0.2.42 port 53190 ssh2
+May 19 00:48:43 ssh-sensor-02 sshd[32240]: Accepted publickey for backup from 192.0.2.42 port 46100 ssh2
+May 19 00:48:43 edge-bastion-01 sshd[32407]: Accepted password for monitor from 198.51.100.36 port 50400 ssh2
