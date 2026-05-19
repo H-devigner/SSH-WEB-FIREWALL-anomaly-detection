@@ -1,0 +1,28 @@
+title: Web Path Traversal Probe
+id: sigma-web-path-traversal-probe
+status: experimental
+description: Detects web requests that try to access parent directories or sensitive operating system files.
+logsource:
+  product: webserver
+  category: access
+detection:
+  selection:
+    url_path|contains:
+      - ../
+      - /etc/passwd
+      - /proc/self/environ
+      - boot.ini
+      - win.ini
+  condition: selection
+fields:
+  - client_ip
+  - http_method
+  - url_path
+  - http_status
+  - response_bytes
+falsepositives:
+  - Security scanners
+  - Vulnerability assessment tools
+level: high
+tags:
+  - attack.initial-access

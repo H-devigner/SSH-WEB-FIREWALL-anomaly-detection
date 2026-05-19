@@ -1,0 +1,25 @@
+title: Web Admin Interface Probe
+id: sigma-web-admin-interface-probe
+status: experimental
+description: Detects requests for common administrative panels and login interfaces.
+logsource:
+  product: webserver
+  category: access
+detection:
+  selection:
+    url_path|contains:
+      - wp-login.php
+      - phpmyadmin
+      - manager/html
+      - /admin
+  condition: selection
+fields:
+  - client_ip
+  - http_method
+  - url_path
+  - http_status
+falsepositives:
+  - Legitimate administrator access
+level: medium
+tags:
+  - attack.discovery

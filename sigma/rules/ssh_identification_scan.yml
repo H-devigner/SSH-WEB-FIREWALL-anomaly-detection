@@ -1,0 +1,20 @@
+title: SSH Identification String Scan
+id: sigma-ssh-identification-scan
+status: experimental
+description: Detects SSH connections that do not complete the protocol identification exchange.
+logsource:
+  product: linux
+  service: sshd
+detection:
+  selection:
+    event_type: connection_scan
+  condition: selection
+fields:
+  - ssh_sensor
+  - source_ip
+  - event_type
+falsepositives:
+  - Network monitoring tools
+level: medium
+tags:
+  - attack.reconnaissance

@@ -1,0 +1,26 @@
+title: Firewall Denied Or Dropped Traffic
+id: sigma-firewall-denied-or-dropped
+status: experimental
+description: Detects firewall events where the action is not allow.
+logsource:
+  product: firewall
+detection:
+  selection_non_allow:
+    action:
+      - deny
+      - drop
+      - reset-both
+      - reset-client
+      - reset-server
+  condition: selection_non_allow
+fields:
+  - action
+  - source_port
+  - destination_port
+  - bytes
+  - packets
+falsepositives:
+  - Normal firewall policy enforcement
+level: medium
+tags:
+  - attack.command-and-control

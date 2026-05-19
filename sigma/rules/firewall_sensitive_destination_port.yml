@@ -1,0 +1,30 @@
+title: Firewall Sensitive Destination Port
+id: sigma-firewall-sensitive-destination-port
+status: experimental
+description: Detects traffic targeting common sensitive administrative or infrastructure ports.
+logsource:
+  product: firewall
+detection:
+  selection:
+    destination_port:
+      - 22
+      - 23
+      - 445
+      - 3389
+      - 3306
+      - 5432
+      - 6379
+      - 9200
+      - 5601
+  condition: selection
+fields:
+  - action
+  - source_port
+  - destination_port
+  - bytes
+  - packets
+falsepositives:
+  - Expected administrative access
+level: medium
+tags:
+  - attack.lateral-movement

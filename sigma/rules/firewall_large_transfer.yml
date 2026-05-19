@@ -1,0 +1,22 @@
+title: Firewall Large Transfer
+id: sigma-firewall-large-transfer
+status: experimental
+description: Detects firewall rows with unusually large byte volume in the live demo.
+logsource:
+  product: firewall
+detection:
+  selection:
+    bytes|gt: 100000
+  condition: selection
+fields:
+  - action
+  - source_port
+  - destination_port
+  - bytes
+  - packets
+  - elapsed_time_sec
+falsepositives:
+  - Legitimate file transfer
+level: low
+tags:
+  - attack.exfiltration

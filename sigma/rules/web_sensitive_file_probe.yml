@@ -1,0 +1,25 @@
+title: Web Sensitive File Probe
+id: sigma-web-sensitive-file-probe
+status: experimental
+description: Detects requests for sensitive application files that should not be publicly exposed.
+logsource:
+  product: webserver
+  category: access
+detection:
+  selection:
+    url_path|contains:
+      - /.env
+      - /.git/config
+      - config.php
+      - wp-config.php
+  condition: selection
+fields:
+  - client_ip
+  - http_method
+  - url_path
+  - http_status
+falsepositives:
+  - Internal security testing
+level: high
+tags:
+  - attack.discovery
