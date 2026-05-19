@@ -28,9 +28,9 @@ Isolation Forest is used because the available data is either unlabeled or only 
 
 | Type | Source location | Collection method | Label quality |
 | --- | --- | --- | --- |
-| Firewall | `Firewall/data/raw/firewall.csv` | CSV stored in the repository | `Action` gives usable ground truth |
-| Web | `WEB LOGS MODEL/data/raw/NASA_access_log_Jul95.gz` | NASA HTTP access log archive, downloaded by the script if missing | No security labels; pseudo labels for evaluation |
-| SSH | `SSH/data/raw/dataset1_log_files.tgz` | SimpleWeb / University of Twente SSH Dataset 1 archive | No direct labels; behavior-rule pseudo labels |
+| Firewall | `Firewall\data\raw\firewall.csv` | CSV stored in the repository | `Action` gives usable ground truth |
+| Web | `WEB LOGS MODEL\data\raw\NASA_access_log_Jul95.gz` | NASA HTTP access log archive, downloaded by the script if missing | No security labels; pseudo labels for evaluation |
+| SSH | `SSH\data\raw\dataset1_log_files.tgz` | SimpleWeb / University of Twente SSH Dataset 1 archive | No direct labels; behavior-rule pseudo labels |
 
 ## Persistent Folder Architecture
 
@@ -56,7 +56,7 @@ Each model type uses the same structure:
 Raw file:
 
 ```text
-Firewall/data/raw/firewall.csv
+Firewall\data\raw\firewall.csv
 ```
 
 Important columns:
@@ -83,8 +83,8 @@ pkts_received
 Code:
 
 ```text
-Firewall/src/firewall_features.py
-Firewall/src/preprocess_firewall.py
+Firewall\src\firewall_features.py
+Firewall\src\preprocess_firewall.py
 ```
 
 Main functions:
@@ -122,8 +122,8 @@ Port_Diversity_Ratio = Destination Port / (Source Port + 1)
 Code:
 
 ```text
-Firewall/src/preprocess_firewall.py
-Firewall/src/train_firewall.py
+Firewall\src\preprocess_firewall.py
+Firewall\src\train_firewall.py
 ```
 
 Training steps:
@@ -137,9 +137,9 @@ Training steps:
 7. Save artifacts:
 
 ```text
-Firewall/models/firewall_scaler.pkl
-Firewall/models/firewall_isolation.pkl
-Firewall/models/firewall_scaler_test.pkl
+Firewall\models\firewall_scaler.pkl
+Firewall\models\firewall_isolation.pkl
+Firewall\models\firewall_scaler_test.pkl
 ```
 
 ### Offline Scoring And Evaluation
@@ -147,8 +147,8 @@ Firewall/models/firewall_scaler_test.pkl
 Code:
 
 ```text
-Firewall/src/evaluate_firewall.py
-evaluation/evaluate_all_models.py
+Firewall\src\evaluate_firewall.py
+evaluation\evaluate_all_models.py
 ```
 
 Evaluation set:
@@ -160,12 +160,12 @@ held-out normal baseline rows + non-allow rows
 Outputs:
 
 ```text
-Firewall/results/firewall_evaluation.csv
-Firewall/results/firewall_metrics.json
-Firewall/results/performance_summary.json
-Firewall/results/inference_benchmark.csv
-Firewall/results/feature_score_correlations.csv
-Firewall/results/figures/*.png
+Firewall\results\firewall_evaluation.csv
+Firewall\results\firewall_metrics.json
+Firewall\results\performance_summary.json
+Firewall\results\inference_benchmark.csv
+Firewall\results\feature_score_correlations.csv
+Firewall\results\figures\*.png
 ```
 
 ## Web Pipeline
@@ -175,7 +175,7 @@ Firewall/results/figures/*.png
 Raw archive:
 
 ```text
-WEB LOGS MODEL/data/raw/NASA_access_log_Jul95.gz
+WEB LOGS MODEL\data\raw\NASA_access_log_Jul95.gz
 ```
 
 The Web script downloads the NASA HTTP archive if it is missing.
@@ -183,7 +183,7 @@ The Web script downloads the NASA HTTP archive if it is missing.
 Main script:
 
 ```text
-WEB LOGS MODEL/src/nasa_anomaly_detection.py
+WEB LOGS MODEL\src\nasa_anomaly_detection.py
 ```
 
 ### Processing
@@ -243,7 +243,7 @@ The model sees a numeric summary of a host's behavior within one hour. For examp
 Code:
 
 ```text
-WEB LOGS MODEL/src/nasa_anomaly_detection.py
+WEB LOGS MODEL\src\nasa_anomaly_detection.py
 ```
 
 Training steps:
@@ -256,8 +256,8 @@ Training steps:
 6. Save artifacts:
 
 ```text
-WEB LOGS MODEL/models/anomaly_model.pkl
-WEB LOGS MODEL/models/scaler.pkl
+WEB LOGS MODEL\models\anomaly_model.pkl
+WEB LOGS MODEL\models\scaler.pkl
 ```
 
 ### Evaluation
@@ -273,13 +273,13 @@ This creates a very imbalanced validation set. The Web ROC-AUC is high, but PR-A
 Outputs:
 
 ```text
-WEB LOGS MODEL/results/web_evaluation.csv
-WEB LOGS MODEL/results/flagged_anomalies.csv
-WEB LOGS MODEL/results/web_metrics.json
-WEB LOGS MODEL/results/performance_summary.json
-WEB LOGS MODEL/results/inference_benchmark.csv
-WEB LOGS MODEL/results/feature_score_correlations.csv
-WEB LOGS MODEL/results/figures/*.png
+WEB LOGS MODEL\results\web_evaluation.csv
+WEB LOGS MODEL\results\flagged_anomalies.csv
+WEB LOGS MODEL\results\web_metrics.json
+WEB LOGS MODEL\results\performance_summary.json
+WEB LOGS MODEL\results\inference_benchmark.csv
+WEB LOGS MODEL\results\feature_score_correlations.csv
+WEB LOGS MODEL\results\figures\*.png
 ```
 
 ## SSH Pipeline
@@ -289,7 +289,7 @@ WEB LOGS MODEL/results/figures/*.png
 Raw archive:
 
 ```text
-SSH/data/raw/dataset1_log_files.tgz
+SSH\data\raw\dataset1_log_files.tgz
 ```
 
 Source:
@@ -305,8 +305,8 @@ The archive contains anonymized SSH authentication logs and Kippo honeypot logs.
 Code:
 
 ```text
-SSH/src/preprocess_ssh.py
-SSH/src/ssh_features.py
+SSH\src\preprocess_ssh.py
+SSH\src\ssh_features.py
 ```
 
 Main functions:
@@ -378,8 +378,8 @@ honeypot sessions
 Code:
 
 ```text
-SSH/src/preprocess_ssh.py
-SSH/src/train_ssh.py
+SSH\src\preprocess_ssh.py
+SSH\src\train_ssh.py
 ```
 
 Training steps:
@@ -393,8 +393,8 @@ Training steps:
 7. Save artifacts:
 
 ```text
-SSH/models/ssh_isolation.pkl
-SSH/models/ssh_scaler.pkl
+SSH\models\ssh_isolation.pkl
+SSH\models\ssh_scaler.pkl
 ```
 
 ### Evaluation
@@ -404,12 +404,12 @@ Evaluation uses held-out normal windows and pseudo-anomaly windows from the rule
 Outputs:
 
 ```text
-SSH/results/ssh_evaluation.csv
-SSH/results/ssh_metrics.json
-SSH/results/performance_summary.json
-SSH/results/inference_benchmark.csv
-SSH/results/feature_score_correlations.csv
-SSH/results/figures/*.png
+SSH\results\ssh_evaluation.csv
+SSH\results\ssh_metrics.json
+SSH\results\performance_summary.json
+SSH\results\inference_benchmark.csv
+SSH\results\feature_score_correlations.csv
+SSH\results\figures\*.png
 ```
 
 ## Live Scoring Pipeline
@@ -417,18 +417,18 @@ SSH/results/figures/*.png
 Files:
 
 ```text
-live/generate_logs.py
-live/listen_and_score.py
+live\generate_logs.py
+live\listen_and_score.py
 ```
 
 ### Generator
 
-`live/generate_logs.py` writes synthetic examples to:
+`live\generate_logs.py` writes synthetic examples to:
 
 ```text
-Firewall/live_logs/firewall_live.csv
-WEB LOGS MODEL/live_logs/web_access.log
-SSH/live_logs/ssh_auth.log
+Firewall\live_logs\firewall_live.csv
+WEB LOGS MODEL\live_logs\web_access.log
+SSH\live_logs\ssh_auth.log
 ```
 
 It generates a mix of normal-looking and suspicious-looking events.
@@ -450,7 +450,7 @@ Useful options:
 
 ### Listener And Scorer
 
-`live/listen_and_score.py` tails all three files and loads each trained model.
+`live\listen_and_score.py` tails all three files and loads each trained model.
 
 Firewall live scoring:
 
@@ -473,9 +473,9 @@ one auth line -> update source_ip/10-minute window -> aggregate current window -
 Live score files:
 
 ```text
-Firewall/live_scores/firewall_scores.jsonl
-WEB LOGS MODEL/live_scores/web_scores.jsonl
-SSH/live_scores/ssh_scores.jsonl
+Firewall\live_scores\firewall_scores.jsonl
+WEB LOGS MODEL\live_scores\web_scores.jsonl
+SSH\live_scores\ssh_scores.jsonl
 ```
 
 Each score payload includes:
@@ -524,7 +524,7 @@ line 3 for host B at hour 10 -> window_events = 1 -> score host B/hour 10
 The shared evaluator is:
 
 ```text
-evaluation/evaluate_all_models.py
+evaluation\evaluate_all_models.py
 ```
 
 It generates:
@@ -553,20 +553,20 @@ This is not a full causal explanation method. It is a practical interpretability
 Docker Compose file:
 
 ```text
-elk/docker-compose.yml
+elk\docker-compose.yml
 ```
 
 Logstash pipeline:
 
 ```text
-elk/logstash/pipeline/cyber-live.conf
+elk\logstash\pipeline\cyber-live.conf
 ```
 
 Kibana setup:
 
 ```text
-elk/setup_elk.py
-elk/setup_kibana.sh
+elk\setup_elk.py
+elk\setup_kibana.ps1
 ```
 
 Flow:

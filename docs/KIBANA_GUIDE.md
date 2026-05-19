@@ -9,14 +9,14 @@ Kibana is used as the live monitoring layer for:
 - Model risk scores and anomaly decisions
 - Operational status categories such as firewall action, web status outcome, and SSH login status
 
-## Start Kibana
+## Start Kibana On Windows
 
-From the repository root:
+Use Windows PowerShell from the repository root.
 
-```bash
-cp elk/.env.example elk/.env
-elk/start_elk.sh
-elk/setup_kibana.sh
+```powershell
+Copy-Item .\elk\.env.example .\elk\.env
+.\elk\start_elk.ps1
+.\elk\setup_kibana.ps1
 ```
 
 Open:
@@ -34,15 +34,15 @@ SSH/Web/Firewall Live Security Dashboard
 ## Data Flow Into Kibana
 
 ```text
-live/generate_logs.py
-  -> Firewall/live_logs/firewall_live.csv
-  -> WEB LOGS MODEL/live_logs/web_access.log
-  -> SSH/live_logs/ssh_auth.log
+live\generate_logs.py
+  -> Firewall\live_logs\firewall_live.csv
+  -> WEB LOGS MODEL\live_logs\web_access.log
+  -> SSH\live_logs\ssh_auth.log
 
-live/listen_and_score.py
-  -> Firewall/live_scores/firewall_scores.jsonl
-  -> WEB LOGS MODEL/live_scores/web_scores.jsonl
-  -> SSH/live_scores/ssh_scores.jsonl
+live\listen_and_score.py
+  -> Firewall\live_scores\firewall_scores.jsonl
+  -> WEB LOGS MODEL\live_scores\web_scores.jsonl
+  -> SSH\live_scores\ssh_scores.jsonl
 
 Logstash
   -> cyber-live-raw-*
@@ -230,8 +230,8 @@ For live testing, keep the refresh interval enabled.
 
 After changing Logstash parsing or Kibana visualizations:
 
-```bash
-elk/setup_kibana.sh
+```powershell
+.\elk\setup_kibana.ps1
 ```
 
 The script:
@@ -244,14 +244,14 @@ The script:
 
 ## Resetting Kibana/Elasticsearch State
 
-```bash
-elk/stop_elk.sh --reset
-elk/start_elk.sh
-elk/setup_kibana.sh
+```powershell
+.\elk\stop_elk.ps1 -Reset
+.\elk\start_elk.ps1
+.\elk\setup_kibana.ps1
 ```
 
 Then generate fresh live data:
 
-```bash
-python live/generate_logs.py --reset --count 100 --interval 0.5 --attack-rate 0.3
+```powershell
+python .\live\generate_logs.py --reset --count 100 --interval 0.5 --attack-rate 0.3
 ```

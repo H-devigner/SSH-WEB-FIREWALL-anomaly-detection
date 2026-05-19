@@ -3,14 +3,14 @@
 PowerPoint file:
 
 ```text
-docs/SSH_WEB_FIREWALL_Academic_Presentation.pptx
+docs\SSH_WEB_FIREWALL_Academic_Presentation.pptx
 ```
 
 Regenerate it with:
 
-```bash
-source .venv/bin/activate
-python docs/create_presentation.py
+```powershell
+.\.venv\Scripts\Activate.ps1
+python .\docs\create_presentation.py
 ```
 
 ## Slide Structure
@@ -100,10 +100,11 @@ python docs/create_presentation.py
     - Live demo generator is synthetic.
 
 16. **Reproducibility**
+    - Windows PowerShell.
     - Python venv.
     - Docker Compose ELK.
     - One command set to train/evaluate.
-    - Multi-terminal live demo.
+    - Multi-terminal PowerShell live demo.
 
 17. **Conclusion**
     - The project provides a practical baseline for multi-source anomaly detection with live visual monitoring.

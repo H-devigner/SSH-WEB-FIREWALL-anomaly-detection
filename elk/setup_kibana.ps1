@@ -1,0 +1,40 @@
+$ErrorActionPreference = "Stop"
+
+$Root = Resolve-Path (Join-Path $PSScriptRoot "..")
+$EnvFile = Join-Path $Root "elk\.env"
+$ExampleEnvFile = Join-Path $Root "elk\.env.example"
+$ComposeFile = Join-Path $Root "elk\docker-compose.yml"
+
+if (-not (Test-Path $EnvFile)) {
+    Copy-Item $ExampleEnvFile $EnvFile
+}
+
+foreach ($Line in Get-Content $EnvFile) {
+    $Trimmed = $Line.Trim()
+    if ($Trimmed.Length -eq 0 -or $Trimmed.StartsWith("#") -or -not $Trimmed.Contains("=")) {
+        continue
+    }
+
+    $Parts = $Trimmed -split "=", 2
+    Set-Item -Path "Env:$($Parts[0].Trim())" -Value $Parts[1].Trim()
+}
+
+& python (Join-Path $Root "elk\setup_elk.py")
+if ($LASTEXITCODE -ne 0) {
+    throw "Kibana setup failed."
+}
+
+& docker container inspect ssh-web-firewall-logstash *> $null
+$LogstashExists = $LASTEXITCODE -eq 0
+
+if ($LogstashExists) {
+    & docker restart ssh-web-firewall-logstash
+} else {
+    & docker compose --env-file $EnvFile -f $ComposeFile up -d logstash
+}
+
+if ($LASTEXITCODE -ne 0) {
+    throw "Logstash start/restart failed."
+}
+
+Write-Host "Logstash is starting and will tail the live log and score files."

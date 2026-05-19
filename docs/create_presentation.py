@@ -160,7 +160,7 @@ def build() -> None:
 
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     add_textbox(slide, 0.7, 1.0, 12.0, 0.7, "SSH/Web/Firewall Anomaly Detection", size=34, bold=True)
-    add_textbox(slide, 0.72, 1.82, 11.6, 0.4, "Multi-source Isolation Forest modeling with live Docker ELK monitoring", size=18, color="slate")
+    add_textbox(slide, 0.72, 1.82, 11.6, 0.4, "Windows PowerShell workflow with live Docker ELK monitoring", size=18, color="slate")
     add_bullets(
         slide,
         0.9,
@@ -390,9 +390,9 @@ def build() -> None:
         [
             "Create a Python virtual environment and install requirements.txt.",
             "Run each model's preprocess, train, and evaluate scripts from the repository root.",
-            "Run evaluation/evaluate_all_models.py to regenerate metrics and figures.",
-            "Start ELK with elk/start_elk.sh and install dashboards with elk/setup_kibana.sh.",
-            "Run live/listen_and_score.py and live/generate_logs.py in separate terminals.",
+            "Run .\\evaluation\\evaluate_all_models.py to regenerate metrics and figures.",
+            "Start ELK with .\\elk\\start_elk.ps1 and install dashboards with .\\elk\\setup_kibana.ps1.",
+            "Run .\\live\\listen_and_score.py and .\\live\\generate_logs.py in separate PowerShell terminals.",
         ],
         size=17,
     )
