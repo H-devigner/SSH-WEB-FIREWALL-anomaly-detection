@@ -111,8 +111,8 @@ def reset_outputs() -> None:
         ROOT / "WEB LOGS MODEL" / "live_scores" / "web_scores.jsonl",
         ROOT / "SSH" / "live_scores" / "ssh_scores.jsonl",
     ]:
-        if path.exists():
-            path.unlink()
+        ensure_parent(path)
+        path.write_text("")
 
 
 def load_firewall_samples() -> tuple[pd.DataFrame, pd.DataFrame]:

@@ -49,6 +49,9 @@ python .\live\listen_and_score.py --from-start --max-events 30
 Generator options:
 - `--attack-rate` controls the approximate suspicious ratio for each type.
 - `--seed` makes the generated demo repeatable.
+- `--reset` empties the existing live log and score files before writing new
+  rows. The files are truncated in place so Logstash can keep tailing them on
+  Windows.
 - Web logs vary client IPs, methods, URLs, byte counts, and HTTP outcomes.
 - SSH logs vary source IPs, users, sensors, auth methods, failed logins,
   invalid users, authentication failures, scans, and closed connections.

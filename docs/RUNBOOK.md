@@ -266,6 +266,37 @@ For a more aggressive dashboard demo:
 python .\live\generate_logs.py --count 100 --interval 0.2 --attack-rate 0.45
 ```
 
+### Kibana Shows Only A Few Generated Logs
+
+First confirm the local files are growing:
+
+```powershell
+(Get-Content .\Firewall\live_logs\firewall_live.csv).Count
+(Get-Content "WEB LOGS MODEL\live_logs\web_access.log").Count
+(Get-Content .\SSH\live_logs\ssh_auth.log).Count
+(Get-Content .\Firewall\live_scores\firewall_scores.jsonl).Count
+(Get-Content "WEB LOGS MODEL\live_scores\web_scores.jsonl").Count
+(Get-Content .\SSH\live_scores\ssh_scores.jsonl).Count
+```
+
+For `--count 100`, expect about 100 Web logs, 100 SSH logs, 101 Firewall lines because of the CSV header, and about 100 score rows for each model if the listener is running.
+
+If local files are correct but Kibana is stale, reset the demo indices and Logstash state:
+
+```powershell
+.\elk\stop_elk.ps1 -Reset
+python .\live\generate_logs.py --reset --count 1 --interval 0
+.\elk\start_elk.ps1
+.\elk\setup_kibana.ps1
+python .\live\listen_and_score.py
+```
+
+Then generate the real batch from another PowerShell terminal:
+
+```powershell
+python .\live\generate_logs.py --reset --count 100 --interval 0.5 --attack-rate 0.3
+```
+
 ### Logstash Does Not Pick Up New Parser Changes
 
 Rerun:

@@ -22,6 +22,8 @@ SSH\live_scores\ssh_scores.jsonl
 
 Docker Desktop mounts those local Windows folders into the Logstash container as read-only bind mounts. Logstash tails the mounted files, so newly appended local lines are detected live.
 
+The Logstash file inputs use non-persistent read offsets for this demo. For a clean live run, empty the local files with `python .\live\generate_logs.py --reset ...` before generating the new batch, then keep the listener and Logstash running while the generator appends lines.
+
 ## Elasticsearch Indices
 
 Raw logs:
