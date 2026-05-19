@@ -100,6 +100,8 @@ Firewall Actions
 Web Status Outcomes
 SSH Login Status
 Top SSH Source IP Risk
+Sigma Rule Hits by Rule
+Sigma Rule Hits by Severity
 ```
 
 `Web Status Outcomes` uses the normalized `status_label` field:
@@ -113,6 +115,8 @@ success, redirect, client_error, server_error, other
 ```text
 accepted, failed, invalid_user, auth_failure, connection, command, other
 ```
+
+`Sigma Rule Hits` panels use prediction rows enriched by the Python rule engine in `live\sigma_rule_engine.py`.
 
 ## Reset Demo State
 

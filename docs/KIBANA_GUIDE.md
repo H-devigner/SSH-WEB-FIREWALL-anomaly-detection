@@ -171,6 +171,26 @@ Ranks SSH source IPs by average `risk_score`.
 
 Use it to identify repeated suspicious source IPs.
 
+### Sigma Rule Hits by Rule
+
+Groups prediction events enriched by the Python rule engine by:
+
+```text
+sigma_rule_id
+```
+
+Use it to see which Sigma-style detections are firing during the live demo.
+
+### Sigma Rule Hits by Severity
+
+Groups rule hits by:
+
+```text
+sigma_rule_level
+```
+
+Use it to separate low, medium, high, and critical detections.
+
 ## Useful Discover Filters
 
 Prediction anomalies only:
@@ -207,6 +227,18 @@ High-risk predictions:
 
 ```text
 event_category : "prediction" and risk_score >= 0.55
+```
+
+Python Sigma rule matches:
+
+```text
+event_category : "prediction" and sigma_match : true
+```
+
+High-severity Sigma matches:
+
+```text
+event_category : "prediction" and sigma_rule_level : "high"
 ```
 
 ## Time Picker

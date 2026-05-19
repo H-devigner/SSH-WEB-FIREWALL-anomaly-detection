@@ -82,18 +82,34 @@ def put_index_templates() -> None:
                         "action": keyword,
                         "host": keyword,
                         "url": keyword,
+                        "client_ip": ip_field,
+                        "url_path": keyword,
+                        "http_method": keyword,
                         "source_ip": ip_field,
                         "source_port": {"type": "integer"},
                         "destination_port": {"type": "integer"},
+                        "bytes": {"type": "long"},
+                        "packets": {"type": "long"},
+                        "elapsed_time_sec": {"type": "float"},
                         "event_type": keyword,
+                        "ssh_sensor": keyword,
+                        "username": keyword,
                         "status": {"type": "integer"},
                         "http_status": {"type": "integer"},
+                        "response_bytes": {"type": "long"},
                         "status_label": keyword_text,
                         "window_events": {"type": "integer"},
                         "prediction": {"type": "integer"},
                         "is_anomaly": {"type": "boolean"},
                         "anomaly_score": {"type": "float"},
                         "risk_score": {"type": "float"},
+                        "sigma_match": {"type": "boolean"},
+                        "sigma_rule_count": {"type": "integer"},
+                        "sigma_engine": keyword,
+                        "sigma_rule_id": keyword,
+                        "sigma_rule_title": keyword_text,
+                        "sigma_rule_level": keyword,
+                        "sigma_rule_tags": keyword,
                     },
                 },
             },
@@ -724,6 +740,78 @@ def build_visualizations() -> list[str]:
         )
     )
 
+    visualizations.append(
+        (
+            "cyber-live-sigma-hits-by-rule",
+            "Sigma Rule Hits by Rule",
+            vega_spec(
+                title="Sigma Rule Hits by Rule",
+                index="cyber-live-scores-*",
+                aggregations={
+                    "sigma_hits": {
+                        "filter": {"term": {"sigma_match": True}},
+                        "aggs": {
+                            "rules": resilient_terms("sigma_rule_id", size=12, order={"_count": "desc"})
+                        },
+                    }
+                },
+                data_property="aggregations.sigma_hits.rules.buckets",
+                mark={"type": "bar", "cornerRadiusEnd": 3},
+                encoding={
+                    "y": {"field": "key", "type": "nominal", "title": "Sigma rule", "sort": "-x"},
+                    "x": {"field": "doc_count", "type": "quantitative", "title": "Hits"},
+                    "color": {"value": "#7c3aed"},
+                    "tooltip": [
+                        {"field": "key", "type": "nominal", "title": "Rule"},
+                        {"field": "doc_count", "type": "quantitative", "title": "Hits"},
+                    ],
+                },
+                width=420,
+                height=180,
+            ),
+        )
+    )
+
+    visualizations.append(
+        (
+            "cyber-live-sigma-hits-by-severity",
+            "Sigma Rule Hits by Severity",
+            vega_spec(
+                title="Sigma Rule Hits by Severity",
+                index="cyber-live-scores-*",
+                aggregations={
+                    "sigma_hits": {
+                        "filter": {"term": {"sigma_match": True}},
+                        "aggs": {
+                            "levels": resilient_terms("sigma_rule_level", size=8, order={"_count": "desc"})
+                        },
+                    }
+                },
+                data_property="aggregations.sigma_hits.levels.buckets",
+                mark={"type": "bar", "cornerRadiusEnd": 3},
+                encoding={
+                    "x": {"field": "key", "type": "nominal", "title": "Severity", "sort": "-y"},
+                    "y": {"field": "doc_count", "type": "quantitative", "title": "Hits"},
+                    "color": {
+                        "field": "key",
+                        "type": "nominal",
+                        "title": "Severity",
+                        "scale": {
+                            "domain": ["low", "medium", "high", "critical"],
+                            "range": ["#65a30d", "#f97316", "#dc2626", "#7f1d1d"],
+                        },
+                    },
+                    "tooltip": [
+                        {"field": "key", "type": "nominal", "title": "Severity"},
+                        {"field": "doc_count", "type": "quantitative", "title": "Hits"},
+                    ],
+                },
+                width=420,
+                height=180,
+            ),
+        )
+    )
+
     ids: list[str] = []
     for object_id, title, spec in visualizations:
         create_saved_object(
@@ -747,6 +835,8 @@ def create_dashboard(visualization_ids: list[str]) -> None:
         {"x": 32, "y": 25, "w": 16, "h": 12},
         {"x": 0, "y": 37, "w": 24, "h": 12},
         {"x": 24, "y": 37, "w": 24, "h": 12},
+        {"x": 0, "y": 49, "w": 24, "h": 12},
+        {"x": 24, "y": 49, "w": 24, "h": 12},
     ]
     for index, object_id in enumerate(visualization_ids):
         panel_ref = f"panel_{index}"

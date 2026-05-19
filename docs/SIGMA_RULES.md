@@ -14,7 +14,7 @@ Yes, Sigma-style rules can be added to this project.
 
 ## Implemented Now
 
-The project currently uses the **Logstash-native rules** option.
+The project currently uses the **Python rule engine** option.
 
 Rule files:
 
@@ -30,21 +30,26 @@ sigma\rules\web_path_traversal_probe.yml
 sigma\rules\web_sensitive_file_probe.yml
 ```
 
-Logstash mirrors those rules in:
+The Python engine loads those files from:
 
 ```text
-elk\logstash\pipeline\cyber-live.conf
+live\sigma_rule_engine.py
+live\listen_and_score.py
 ```
 
-When a rule matches, the raw event is enriched with:
+When a rule matches, the live prediction JSONL event is enriched with:
 
 ```text
 sigma_match
+sigma_rule_count
+sigma_engine
 sigma_rule_id
 sigma_rule_title
 sigma_rule_level
 sigma_rule_tags
 ```
+
+For Sigma fields, Logstash ingests the already enriched JSONL prediction files. Raw logs are still indexed normally, but the rule decisions are made in Python, not in Logstash.
 
 ## Rules
 
@@ -61,6 +66,13 @@ sigma_rule_tags
 | `sigma-firewall-large-transfer` | Firewall | low | Firewall row has more than 100000 bytes |
 
 ## Kibana Filters
+
+The Kibana setup also creates:
+
+```text
+Sigma Rule Hits by Rule
+Sigma Rule Hits by Severity
+```
 
 All Sigma matches:
 
@@ -83,5 +95,5 @@ sigma_rule_id : "sigma-web-path-traversal-probe"
 Matched SSH detections:
 
 ```text
-model_type : "ssh" and sigma_match : true
+model : "ssh" and sigma_match : true
 ```

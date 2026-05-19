@@ -28,6 +28,7 @@ from firewall_features import FEATURES as FIREWALL_FEATURES  # noqa: E402
 from firewall_features import add_firewall_features  # noqa: E402
 from ssh_features import FEATURES as SSH_FEATURES  # noqa: E402
 from ssh_features import build_feature_table, parse_auth_line  # noqa: E402
+from sigma_rule_engine import SigmaRuleEngine, enrich_event  # noqa: E402
 
 
 FIREWALL_LOG = FIREWALL_ROOT / "live_logs" / "firewall_live.csv"
@@ -37,6 +38,7 @@ SSH_LOG = SSH_ROOT / "live_logs" / "ssh_auth.log"
 FIREWALL_SCORE_FILE = FIREWALL_ROOT / "live_scores" / "firewall_scores.jsonl"
 WEB_SCORE_FILE = WEB_ROOT / "live_scores" / "web_scores.jsonl"
 SSH_SCORE_FILE = SSH_ROOT / "live_scores" / "ssh_scores.jsonl"
+SIGMA_RULES_DIR = ROOT / "sigma" / "rules"
 
 WEB_FEATURES = [
     "request_count",
@@ -186,6 +188,9 @@ def make_firewall_handler() -> Callable[[str], dict | None]:
             "action": row["Action"],
             "source_port": int(row["Source Port"]),
             "destination_port": int(row["Destination Port"]),
+            "bytes": int(row["Bytes"]),
+            "packets": int(row["Packets"]),
+            "elapsed_time_sec": float(row["Elapsed Time (sec)"]),
             "prediction": prediction,
             "is_anomaly": prediction == -1,
             "anomaly_score": anomaly_score,
@@ -257,10 +262,14 @@ def make_web_handler() -> Callable[[str], dict | None]:
             "model": "web",
             "scored_at": datetime.now(timezone.utc).isoformat(),
             "host": event["host"],
+            "client_ip": event["host"],
             "url": event["url"],
+            "url_path": event["url"],
+            "http_method": event["method"],
             "status": event["status"],
             "http_status": event["status"],
             "status_label": event["status_label"],
+            "response_bytes": event["bytes"],
             "window_events": len(windows[key]),
             "prediction": prediction,
             "is_anomaly": prediction == -1,
@@ -291,7 +300,10 @@ def make_ssh_handler() -> Callable[[str], dict | None]:
         return {
             "model": "ssh",
             "scored_at": datetime.now(timezone.utc).isoformat(),
+            "ssh_sensor": event["sensor_ip"],
             "source_ip": event["source_ip"],
+            "source_port": event["source_port"],
+            "username": event["username"],
             "event_type": event["event_type"],
             "status_label": ssh_status_label(event["event_type"]),
             "window_events": len(windows[key]),
@@ -310,6 +322,7 @@ def main() -> None:
     parser.add_argument("--max-events", type=int, default=0, help="Stop after scoring this many events; 0 means run forever.")
     parser.add_argument("--from-start", action="store_true", help="Consume existing file contents before tailing new data.")
     args = parser.parse_args()
+    sigma_engine = SigmaRuleEngine.from_directory(SIGMA_RULES_DIR)
 
     listeners = [
         {
@@ -333,7 +346,10 @@ def main() -> None:
     ]
 
     scored = 0
-    print("listening for Firewall, Web, and SSH logs...", flush=True)
+    print(
+        f"listening for Firewall, Web, and SSH logs with {len(sigma_engine.rules)} Sigma rules...",
+        flush=True,
+    )
     while True:
         made_progress = False
         for listener in listeners:
@@ -341,6 +357,7 @@ def main() -> None:
                 result = listener["handler"](line)
                 if result is None:
                     continue
+                enrich_event(result, sigma_engine.match(result))
                 append_score(listener["score_file"], result)
                 print(json.dumps(result), flush=True)
                 scored += 1

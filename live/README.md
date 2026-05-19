@@ -25,6 +25,11 @@ grouping. Web labels are `success`, `redirect`, `client_error`,
 `server_error`, or `other`; SSH labels include `accepted`, `failed`,
 `invalid_user`, `auth_failure`, `connection`, `command`, and `other`.
 
+The listener also loads Sigma-style YAML rules from `sigma\rules` using the
+Python rule engine in `live\sigma_rule_engine.py`. Matching score rows include
+`sigma_match`, `sigma_rule_count`, `sigma_engine`, `sigma_rule_id`,
+`sigma_rule_title`, `sigma_rule_level`, and `sigma_rule_tags`.
+
 Example, two PowerShell terminals from the repository root:
 
 Terminal 1:

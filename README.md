@@ -92,6 +92,7 @@ python .\live\generate_logs.py --reset --count 100 --interval 0.5 --attack-rate 
 - [Detailed pipeline documentation](docs/PIPELINE.md)
 - [Clone-and-run terminal runbook](docs/RUNBOOK.md)
 - [Kibana guide](docs/KIBANA_GUIDE.md)
+- [Sigma rule engine guide](docs/SIGMA_RULES.md)
 - [Evaluation results](docs/RESULTS.md)
 - [Academic presentation outline](docs/PRESENTATION.md)
 - [PowerPoint deck](docs/SSH_WEB_FIREWALL_Academic_Presentation.pptx)
