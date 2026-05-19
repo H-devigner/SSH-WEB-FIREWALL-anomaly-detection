@@ -114,9 +114,10 @@ PowerShell terminal 1:
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
-Copy-Item .\elk\.env.example .\elk\.env
 .\elk\start_elk.ps1
 ```
+
+The ELK scripts create `elk\.env` if it is missing and backfill new required settings from `elk\.env.example`.
 
 Wait until Kibana is reachable:
 
@@ -264,6 +265,31 @@ For a more aggressive dashboard demo:
 
 ```powershell
 python .\live\generate_logs.py --count 100 --interval 0.2 --attack-rate 0.45
+```
+
+### Kibana Missing Encrypted Saved Objects Key
+
+If Kibana shows this error:
+
+```text
+Unable to create actions client because the Encrypted Saved Objects plugin is missing encryption key.
+```
+
+Update the repo, then restart ELK:
+
+```powershell
+git pull origin main
+.\elk\stop_elk.ps1
+.\elk\start_elk.ps1
+.\elk\setup_kibana.ps1
+```
+
+The scripts append any missing `KIBANA_*_KEY` values from `elk\.env.example` into your existing `elk\.env`. If the error remains because Kibana kept old container state, reset the demo volumes:
+
+```powershell
+.\elk\stop_elk.ps1 -Reset
+.\elk\start_elk.ps1
+.\elk\setup_kibana.ps1
 ```
 
 ### Kibana Shows Only A Few Generated Logs

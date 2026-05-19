@@ -54,10 +54,11 @@ python .\evaluation\evaluate_all_models.py
 Start Elasticsearch and Kibana:
 
 ```powershell
-Copy-Item .\elk\.env.example .\elk\.env
 .\elk\start_elk.ps1
 .\elk\setup_kibana.ps1
 ```
+
+The ELK scripts create `elk\.env` if it is missing and backfill any new required settings from `elk\.env.example`.
 
 Open Kibana:
 

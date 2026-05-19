@@ -47,9 +47,10 @@ cyber-live-scores-ssh-YYYY.MM.dd
 Open PowerShell from the repository root:
 
 ```powershell
-Copy-Item .\elk\.env.example .\elk\.env
 .\elk\start_elk.ps1
 ```
+
+`start_elk.ps1` creates `elk\.env` if it is missing and backfills any new required settings from `elk\.env.example`. The example file includes stable Kibana encryption keys so dashboards, actions, alerting, sessions, and reporting can use encrypted saved objects.
 
 Install Elasticsearch index templates, Kibana data views, visualizations, and the dashboard:
 
@@ -165,6 +166,28 @@ If Kibana loads before the dashboard is installed, wait until `http://localhost:
 ```
 
 If charts look stale, hard refresh the browser and set the Kibana time picker to `Last 15 minutes` or a wider window.
+
+If Kibana reports this error:
+
+```text
+Unable to create actions client because the Encrypted Saved Objects plugin is missing encryption key.
+```
+
+Pull the latest repo changes, then recreate Kibana with the updated `elk\.env` values:
+
+```powershell
+.\elk\stop_elk.ps1
+.\elk\start_elk.ps1
+.\elk\setup_kibana.ps1
+```
+
+The PowerShell scripts automatically append any missing keys from `elk\.env.example` into your existing `elk\.env`. If Kibana still uses old container state, reset the demo volumes:
+
+```powershell
+.\elk\stop_elk.ps1 -Reset
+.\elk\start_elk.ps1
+.\elk\setup_kibana.ps1
+```
 
 If Docker reports container name conflicts:
 

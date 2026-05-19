@@ -287,3 +287,29 @@ Then generate fresh live data:
 ```powershell
 python .\live\generate_logs.py --reset --count 100 --interval 0.5 --attack-rate 0.3
 ```
+
+## Encrypted Saved Objects Error
+
+Kibana actions and alerting need a stable encrypted saved objects key. The Docker Compose configuration reads these values from `elk\.env`:
+
+```text
+KIBANA_ENCRYPTEDSAVEDOBJECTS_KEY
+KIBANA_SECURITY_KEY
+KIBANA_REPORTING_KEY
+```
+
+The PowerShell helper scripts create `elk\.env` if it is missing and append any missing keys from `elk\.env.example`. If Kibana reports that the Encrypted Saved Objects plugin is missing an encryption key, restart ELK:
+
+```powershell
+.\elk\stop_elk.ps1
+.\elk\start_elk.ps1
+.\elk\setup_kibana.ps1
+```
+
+If the same error remains, reset the demo volumes and start again:
+
+```powershell
+.\elk\stop_elk.ps1 -Reset
+.\elk\start_elk.ps1
+.\elk\setup_kibana.ps1
+```
