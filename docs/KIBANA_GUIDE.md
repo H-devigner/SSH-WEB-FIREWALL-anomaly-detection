@@ -171,6 +171,37 @@ Ranks SSH source IPs by average `risk_score`.
 
 Use it to identify repeated suspicious source IPs.
 
+### Firewall Destination Ports by Action
+
+Shows the busiest destination ports and splits each port by firewall `action`.
+
+Use it to quickly see which ports are mostly allowed, denied, dropped, or reset.
+
+### Web Error URLs by Status
+
+Shows the most common Web URL paths with HTTP status `400` and above, split by normalized `status_label`.
+
+Use it to identify noisy attack targets such as `/wp-login.php`, `/.env`, or path traversal probes.
+
+### SSH Usernames by Status
+
+Shows the most common SSH usernames and splits them by login status.
+
+Use it to see whether usernames such as `root`, `admin`, or `oracle` are mostly invalid-user or failed-login events.
+
+### Risk Bands by Model
+
+Groups prediction events into simple `risk_score` bands:
+
+```text
+0.00-0.40
+0.40-0.55
+0.55-0.70
+0.70-1.00
+```
+
+Use it to compare whether Firewall, Web, or SSH is producing mostly low-risk or high-risk predictions.
+
 ### Sigma Rule Hits by Rule
 
 Groups prediction events enriched by the Python rule engine by:

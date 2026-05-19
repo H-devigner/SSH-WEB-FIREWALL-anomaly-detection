@@ -101,6 +101,10 @@ Firewall Actions
 Web Status Outcomes
 SSH Login Status
 Top SSH Source IP Risk
+Firewall Destination Ports by Action
+Web Error URLs by Status
+SSH Usernames by Status
+Risk Bands by Model
 Sigma Rule Hits by Rule
 Sigma Rule Hits by Severity
 ```

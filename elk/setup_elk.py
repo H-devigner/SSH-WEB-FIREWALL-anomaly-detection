@@ -742,6 +742,207 @@ def build_visualizations() -> list[str]:
 
     visualizations.append(
         (
+            "cyber-live-firewall-ports-by-action",
+            "Firewall Destination Ports by Action",
+            vega_spec(
+                title="Firewall Destination Ports by Action",
+                index="cyber-live-raw-firewall-*",
+                aggregations={
+                    "ports": {
+                        **resilient_terms("destination_port", size=10, order={"_count": "desc"}),
+                        "aggs": {
+                            "actions": resilient_terms("action", size=8, order={"_count": "desc"})
+                        },
+                    }
+                },
+                data_property="aggregations.ports.buckets",
+                mark={"type": "bar", "cornerRadiusEnd": 2},
+                transform=[
+                    {"flatten": ["actions.buckets"], "as": ["action_bucket"]},
+                    {"calculate": "datum.action_bucket.key", "as": "action"},
+                    {"calculate": "datum.action_bucket.doc_count", "as": "events"},
+                ],
+                encoding={
+                    "y": {"field": "key", "type": "nominal", "title": "Destination port", "sort": "-x"},
+                    "x": {"field": "events", "type": "quantitative", "title": "Events", "stack": "zero"},
+                    "color": {
+                        "field": "action",
+                        "type": "nominal",
+                        "title": "Action",
+                        "scale": {"range": ["#16a34a", "#dc2626", "#f97316", "#2563eb", "#64748b"]},
+                    },
+                    "tooltip": [
+                        {"field": "key", "type": "nominal", "title": "Destination port"},
+                        {"field": "action", "type": "nominal", "title": "Action"},
+                        {"field": "events", "type": "quantitative", "title": "Events"},
+                    ],
+                },
+                width=420,
+                height=180,
+            ),
+        )
+    )
+
+    visualizations.append(
+        (
+            "cyber-live-web-error-urls",
+            "Web Error URLs by Status",
+            vega_spec(
+                title="Web Error URLs by Status",
+                index="cyber-live-raw-web-*",
+                aggregations={
+                    "errors": {
+                        "filter": {"range": {"http_status": {"gte": 400}}},
+                        "aggs": {
+                            "urls": {
+                                **resilient_terms("url_path", size=10, order={"_count": "desc"}),
+                                "aggs": {
+                                    "statuses": resilient_terms(
+                                        "status_label",
+                                        size=5,
+                                        order={"_count": "desc"},
+                                    )
+                                },
+                            }
+                        },
+                    }
+                },
+                data_property="aggregations.errors.urls.buckets",
+                mark={"type": "bar", "cornerRadiusEnd": 2},
+                transform=[
+                    {"flatten": ["statuses.buckets"], "as": ["status_bucket"]},
+                    {"calculate": "datum.status_bucket.key", "as": "status"},
+                    {"calculate": "datum.status_bucket.doc_count", "as": "events"},
+                ],
+                encoding={
+                    "y": {"field": "key", "type": "nominal", "title": "URL path", "sort": "-x"},
+                    "x": {"field": "events", "type": "quantitative", "title": "Errors", "stack": "zero"},
+                    "color": {
+                        "field": "status",
+                        "type": "nominal",
+                        "title": "Status",
+                        "scale": {
+                            "domain": ["client_error", "server_error", "other"],
+                            "range": ["#f97316", "#dc2626", "#64748b"],
+                        },
+                    },
+                    "tooltip": [
+                        {"field": "key", "type": "nominal", "title": "URL path"},
+                        {"field": "status", "type": "nominal", "title": "Status"},
+                        {"field": "events", "type": "quantitative", "title": "Errors"},
+                    ],
+                },
+                width=420,
+                height=180,
+            ),
+        )
+    )
+
+    visualizations.append(
+        (
+            "cyber-live-ssh-usernames-by-status",
+            "SSH Usernames by Status",
+            vega_spec(
+                title="SSH Usernames by Status",
+                index="cyber-live-raw-ssh-*",
+                aggregations={
+                    "users": {
+                        **resilient_terms("username", size=12, order={"_count": "desc"}),
+                        "aggs": {
+                            "statuses": resilient_terms("status_label", size=8, order={"_count": "desc"})
+                        },
+                    }
+                },
+                data_property="aggregations.users.buckets",
+                mark={"type": "bar", "cornerRadiusEnd": 2},
+                transform=[
+                    {"flatten": ["statuses.buckets"], "as": ["status_bucket"]},
+                    {"calculate": "datum.status_bucket.key", "as": "status"},
+                    {"calculate": "datum.status_bucket.doc_count", "as": "events"},
+                ],
+                encoding={
+                    "y": {"field": "key", "type": "nominal", "title": "Username", "sort": "-x"},
+                    "x": {"field": "events", "type": "quantitative", "title": "Events", "stack": "zero"},
+                    "color": {
+                        "field": "status",
+                        "type": "nominal",
+                        "title": "Status",
+                        "scale": {
+                            "domain": ["accepted", "failed", "invalid_user", "auth_failure", "connection", "other"],
+                            "range": ["#16a34a", "#f97316", "#dc2626", "#7c3aed", "#0891b2", "#64748b"],
+                        },
+                    },
+                    "tooltip": [
+                        {"field": "key", "type": "nominal", "title": "Username"},
+                        {"field": "status", "type": "nominal", "title": "Status"},
+                        {"field": "events", "type": "quantitative", "title": "Events"},
+                    ],
+                },
+                width=420,
+                height=180,
+            ),
+        )
+    )
+
+    visualizations.append(
+        (
+            "cyber-live-risk-bands-by-model",
+            "Risk Bands by Model",
+            vega_spec(
+                title="Risk Bands by Model",
+                index="cyber-live-scores-*",
+                aggregations={
+                    "risk_bands": {
+                        "range": {
+                            "field": "risk_score",
+                            "keyed": False,
+                            "ranges": [
+                                {"key": "0.00-0.40", "to": 0.40},
+                                {"key": "0.40-0.55", "from": 0.40, "to": 0.55},
+                                {"key": "0.55-0.70", "from": 0.55, "to": 0.70},
+                                {"key": "0.70-1.00", "from": 0.70, "to": 1.00},
+                            ],
+                        },
+                        "aggs": {
+                            "by_model": resilient_terms("model", size=10, order={"_count": "desc"})
+                        },
+                    }
+                },
+                data_property="aggregations.risk_bands.buckets",
+                mark={"type": "bar", "cornerRadiusEnd": 2},
+                transform=[
+                    {"flatten": ["by_model.buckets"], "as": ["model_bucket"]},
+                    {"calculate": "datum.model_bucket.key", "as": "model"},
+                    {"calculate": "datum.model_bucket.doc_count", "as": "events"},
+                ],
+                encoding={
+                    "x": {
+                        "field": "key",
+                        "type": "ordinal",
+                        "title": "Risk score band",
+                        "sort": ["0.00-0.40", "0.40-0.55", "0.55-0.70", "0.70-1.00"],
+                    },
+                    "y": {"field": "events", "type": "quantitative", "title": "Predictions"},
+                    "color": {
+                        "field": "model",
+                        "type": "nominal",
+                        "title": "Model",
+                        "scale": {"range": ["#2563eb", "#0f766e", "#f97316"]},
+                    },
+                    "tooltip": [
+                        {"field": "key", "type": "nominal", "title": "Risk band"},
+                        {"field": "model", "type": "nominal", "title": "Model"},
+                        {"field": "events", "type": "quantitative", "title": "Predictions"},
+                    ],
+                },
+                width=420,
+                height=180,
+            ),
+        )
+    )
+
+    visualizations.append(
+        (
             "cyber-live-sigma-hits-by-rule",
             "Sigma Rule Hits by Rule",
             vega_spec(
@@ -837,6 +1038,10 @@ def create_dashboard(visualization_ids: list[str]) -> None:
         {"x": 24, "y": 37, "w": 24, "h": 12},
         {"x": 0, "y": 49, "w": 24, "h": 12},
         {"x": 24, "y": 49, "w": 24, "h": 12},
+        {"x": 0, "y": 61, "w": 24, "h": 12},
+        {"x": 24, "y": 61, "w": 24, "h": 12},
+        {"x": 0, "y": 73, "w": 24, "h": 12},
+        {"x": 24, "y": 73, "w": 24, "h": 12},
     ]
     for index, object_id in enumerate(visualization_ids):
         panel_ref = f"panel_{index}"
