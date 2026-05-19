@@ -24,11 +24,16 @@ if ($LASTEXITCODE -ne 0) {
     throw "Kibana setup failed."
 }
 
-& docker container inspect ssh-web-firewall-logstash *> $null
-$LogstashExists = $LASTEXITCODE -eq 0
+$LogstashName = "ssh-web-firewall-logstash"
+$LogstashNames = @(& docker ps -a --filter "name=$LogstashName" --format "{{.Names}}")
+if ($LASTEXITCODE -ne 0) {
+    throw "Could not check Logstash container state."
+}
+
+$LogstashExists = $LogstashNames -contains $LogstashName
 
 if ($LogstashExists) {
-    & docker restart ssh-web-firewall-logstash
+    & docker restart $LogstashName
 } else {
     & docker compose --env-file $EnvFile -f $ComposeFile up -d logstash
 }
